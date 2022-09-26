@@ -1,5 +1,6 @@
 package com.employee.management.service;
 
+import com.employee.management.Repository.EmployeeRepository;
 import com.employee.management.entity.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,24 +16,31 @@ public class EmployeeService {
             new Employee(2, "second emp", "Canada")
     );
 
+    @Autowired
+    EmployeeRepository employeeRepository;
+
     public List<Employee> getAllEmployees() {
         return employeeList;
 
     }
 
     public Employee getEmployee(int empId) {
-        return employeeList.stream().
-                filter(employee -> (employee.getEmployeeId() == empId)).findFirst().get();
+        /*return employeeList.stream().
+                filter(employee -> (employee.getEmployeeId() == empId)).findFirst().get();*/
+
+        return employeeRepository.findById(empId).orElseThrow(() -> new RuntimeException("Employee not found"));
 
     }
 
     public void createEmployee(Employee employee) {
-        employeeList.add(employee);
+
+        //employeeList.add(employee);
+        employeeRepository.save(employee);
     }
 
 
     public void updateEmployee(Employee employee) {
-        List<Employee> tempEmployee = new ArrayList<>();
+      /*  List<Employee> tempEmployee = new ArrayList<>();
         for (Employee emp : employeeList) {
             if (emp.getEmployeeId() == employee.getEmployeeId()) {
                 emp.setEmployeeCity(employee.getEmployeeCity());
@@ -40,17 +48,20 @@ public class EmployeeService {
             }
             tempEmployee.add(emp);
         }
-        this.employeeList = tempEmployee;
+        this.employeeList = tempEmployee;* - without JPA/
+       */
+        employeeRepository.save(employee);
     }
 
     public void deleteEmployee(int empId) {
-        List<Employee> tempEmployee = new ArrayList<>();
+       /* List<Employee> tempEmployee = new ArrayList<>();
         for (Employee emp : employeeList) {
             if (emp.getEmployeeId() == empId) continue;
             tempEmployee.add(emp);
 
         }
-        this.employeeList = tempEmployee;
+        this.employeeList = tempEmployee; -without JPA */
+        employeeRepository.delete(employeeRepository.getById(empId));
 
     }
 }
